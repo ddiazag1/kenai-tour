@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>40248 Arrowhead Ave - massing model</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@400;500;600&family=Azeret+Mono:wght@400;500&display=swap">
+<style>
+  :root{--ground:#f4f2ed;--card:#fff;--ink:#191a17;--muted:#5f6660;--rule:#dcd9d1;--firm:#b4b0a6;--accent:#2f6fa8;
+        --ui:"Barlow Semi Condensed",system-ui,sans-serif;--mono:"Azeret Mono",ui-monospace,monospace}
+  @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+    --ground:#14161a;--card:#1c1f24;--ink:#e7e9e4;--muted:#9aa09a;--rule:#2e333a;--firm:#49505a;--accent:#6fa8dc}}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--ui);font-size:17px;padding:1rem 1rem 3rem}
+  .wrap{max-width:54rem;margin:0 auto}
+  a.back{font-family:var(--mono);font-size:.68rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);text-decoration:none}
+  h1{margin:.5rem 0 0;font-size:1.45rem;font-weight:600}
+  .sub{font-family:var(--mono);font-size:.68rem;color:var(--muted);letter-spacing:.05em;margin-top:.2rem}
+  #stage{width:100%;aspect-ratio:4/3;max-height:70vh;background:var(--card);border:1px solid var(--rule);
+         border-radius:4px;margin-top:.9rem;touch-action:none;cursor:grab}
+  #stage:active{cursor:grabbing}
+  .ctl{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.6rem}
+  button{font-family:var(--mono);font-size:.68rem;letter-spacing:.06em;text-transform:uppercase;padding:.45em .7em;
+         border:1px solid var(--firm);background:transparent;color:var(--muted);border-radius:3px;cursor:pointer}
+  button[aria-pressed="true"]{background:var(--ink);color:var(--ground);border-color:var(--ink)}
+  .dims{display:grid;grid-template-columns:repeat(auto-fit,minmax(9rem,1fr));gap:.4rem .9rem;margin-top:1rem;
+        font-family:var(--mono);font-size:.72rem;color:var(--muted)}
+  .dims b{color:var(--ink);font-weight:500;display:block;font-size:.95rem}
+  .caveat{margin-top:1.1rem;border:1px solid var(--firm);border-left:3px solid var(--accent);background:var(--card);
+          padding:.7rem .85rem;font-size:.9rem;color:var(--muted);line-height:1.5}
+  .caveat strong{color:var(--ink)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="./">&larr; Back to the tour</a>
+  <h1>40248 Arrowhead Avenue</h1>
+  <div class="sub">Approximate massing &middot; 4,628 sqft &middot; 4 bd / 4 ba &middot; $815,000</div>
+
+  <canvas id="stage"></canvas>
+  <div class="ctl">
+    <button id="roof" type="button" aria-pressed="true">Roof</button>
+    <button id="spin" type="button" aria-pressed="false">Spin</button>
+    <button id="reset" type="button">Reset view</button>
+  </div>
+
+  <div class="dims">
+    <div><b>Main block</b>68 x 38 ft, 1 storey</div>
+    <div><b>Garage wing</b>30 x 34 ft, 2 storey</div>
+    <div><b>Porch</b>26 x 8 ft, covered</div>
+    <div><b>Enclosed area</b>~4,600 sqft</div>
+  </div>
+
+  <div class="caveat">
+    <strong>This is a massing study, not a survey.</strong> Two exterior photos cannot reconstruct a building —
+    photogrammetry needs dozens of overlapping shots. The footprint here is scaled so the enclosed area lands near
+    the MLS figure of 4,628 sqft, and the proportions, roof pitches and the bonus room over the garage are read
+    off the site photos. Treat it as a volume comparison between houses, not as dimensions to plan from.
+    <strong>Drag to orbit, pinch or scroll to zoom.</strong>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function(){
+  "use strict";
+  if (!window.THREE) { document.getElementById('stage').replaceWith('3D library failed to load.'); return; }
+
+  var cv = document.getElementById('stage');
+  var dark = matchMedia('(prefers-color-scheme: dark)').matches;
+  var scene = new THREE.Scene();
+  scene.background = new THREE.Color(dark ? 0x1c1f24 : 0xffffff);
+
+  var cam = new THREE.PerspectiveCamera(42, 1, 0.5, 2000);
+  var renderer = new THREE.WebGLRenderer({canvas: cv, antialias: true});
+
+  scene.add(new THREE.HemisphereLight(0xffffff, dark ? 0x202428 : 0xcfd4cc, dark ? 0.85 : 1.0));
+  var sun = new THREE.DirectionalLight(0xffffff, dark ? 0.55 : 0.75);
+  sun.position.set(-70, 110, 60); scene.add(sun);
+
+  var WALL = dark ? 0x6d7781 : 0x8d9aa4;   // grey siding
+  var TRIM = dark ? 0x2f5347 : 0x335c4b;   // green trim
+  var ROOF = dark ? 0x3a4046 : 0x5c6168;
+  var PAD  = dark ? 0x23272c : 0xd8d5cd;
+
+  var g = new THREE.Group(); scene.add(g);
+  var roofGroup = new THREE.Group(); g.add(roofGroup);
+
+  function box(w,h,d,color,x,y,z){
+    var m = new THREE.Mesh(new THREE.BoxGeometry(w,h,d), new THREE.MeshLambertMaterial({color:color}));
+    m.position.set(x,y,z); return m;
+  }
+  // Gable roof as a triangular prism extruded along the ridge.
+  function gable(span, rise, len, color, x, y, z, rotY){
+    var s = new THREE.Shape();
+    s.moveTo(-span/2, 0); s.lineTo(span/2, 0); s.lineTo(0, rise); s.lineTo(-span/2, 0);
+    var geo = new THREE.ExtrudeGeometry(s, {depth: len, bevelEnabled: false});
+    geo.translate(0, 0, -len/2);
+    var m = new THREE.Mesh(geo, new THREE.MeshLambertMaterial({color:color}));
+    m.rotation.y = rotY || 0; m.position.set(x,y,z); return m;
+  }
+
+  // ---- main block: 68 x 38, single storey ----
+  var MW=68, MD=38, MH=10;
+  g.add(box(MW, MH, MD, WALL, 0, MH/2, 0));
+  g.add(box(MW+2, 0.8, MD+2, TRIM, 0, MH+0.4, 0));           // eave band
+  roofGroup.add(gable(MD+3, 7, MW+2, ROOF, 0, MH+0.8, 0, Math.PI/2));
+
+  // ---- garage wing: 30 x 34, two storey, steeper gable ----
+  var GW=30, GD=34, GH=18;
+  var gx = MW/2 + GW/2 - 2, gz = -2;
+  g.add(box(GW, GH, GD, WALL, gx, GH/2, gz));
+  g.add(box(GW+2, 0.8, GD+2, TRIM, gx, GH+0.4, gz));
+  roofGroup.add(gable(GW+3, 13, GD+2, ROOF, gx, GH+0.8, gz, 0));
+
+  // garage doors + man door on the front face (south, +Z)
+  var gf = gz + GD/2 + 0.2;
+  g.add(box(9, 8, 0.5, 0xf2f2ef, gx-7.5, 4, gf));
+  g.add(box(9, 8, 0.5, 0xf2f2ef, gx+7.5, 4, gf));
+  g.add(box(3, 7, 0.5, 0xf2f2ef, gx-13.5, 3.5, gf));
+  g.add(box(3.5, 4, 0.5, 0xd8e4ea, gx-12, 12.5, gf));         // bonus-room window in the gable
+
+  // ---- covered porch on the main block front ----
+  var PW=26, PD=8;
+  var px = -8, pz = MD/2 + PD/2;
+  g.add(box(PW, 0.6, PD, TRIM, px, 1.0, pz));                 // deck
+  roofGroup.add(box(PW+2, 0.7, PD+2, ROOF, px, MH-0.5, pz));  // porch roof
+  [-PW/2+1, px===px?0:0, PW/2-1].forEach(function(o){
+    g.add(box(0.7, MH-1.5, 0.7, TRIM, px+o, (MH-1.5)/2+1, pz+PD/2-0.6));
+  });
+  g.add(box(3.5, 7, 0.5, 0x3a2f26, px+2, 4.5, MD/2+0.3));     // front door
+
+  // ---- ground pad ----
+  var pad = new THREE.Mesh(new THREE.PlaneGeometry(190,170), new THREE.MeshLambertMaterial({color:PAD}));
+  pad.rotation.x = -Math.PI/2; pad.position.y = -0.05; scene.add(pad);
+
+  // ---- orbit (hand-rolled: avoids a second CDN dependency) ----
+  var az = -0.75, el = 0.42, dist = 150, target = new THREE.Vector3(8, 6, 0);
+  function place(){
+    cam.position.set(
+      target.x + dist*Math.cos(el)*Math.sin(az),
+      target.y + dist*Math.sin(el),
+      target.z + dist*Math.cos(el)*Math.cos(az));
+    cam.lookAt(target);
+  }
+  var drag=false, lx=0, ly=0;
+  function down(e){drag=true; var p=pt(e); lx=p.x; ly=p.y;}
+  function move(e){
+    if(!drag) return;
+    var p=pt(e);
+    az -= (p.x-lx)*0.008;
+    el = Math.max(0.06, Math.min(1.45, el + (p.y-ly)*0.006));
+    lx=p.x; ly=p.y; place(); e.preventDefault();
+  }
+  function up(){drag=false;}
+  function pt(e){ var t=e.touches&&e.touches[0]; return {x: t?t.clientX:e.clientX, y: t?t.clientY:e.clientY}; }
+  cv.addEventListener('mousedown',down); window.addEventListener('mousemove',move); window.addEventListener('mouseup',up);
+  cv.addEventListener('touchstart',down,{passive:true}); cv.addEventListener('touchmove',move,{passive:false}); cv.addEventListener('touchend',up);
+  cv.addEventListener('wheel',function(e){dist=Math.max(55,Math.min(420,dist+e.deltaY*0.22)); place(); e.preventDefault();},{passive:false});
+  var pinch=0;
+  cv.addEventListener('touchmove',function(e){
+    if(e.touches.length===2){
+      var dx=e.touches[0].clientX-e.touches[1].clientX, dy=e.touches[0].clientY-e.touches[1].clientY;
+      var d=Math.sqrt(dx*dx+dy*dy);
+      if(pinch) { dist=Math.max(55,Math.min(420,dist+(pinch-d)*0.6)); place(); }
+      pinch=d; e.preventDefault();
+    }
+  },{passive:false});
+  cv.addEventListener('touchend',function(){pinch=0;});
+
+  // ---- controls ----
+  var spinning=false;
+  var rb=document.getElementById('roof'), sb=document.getElementById('spin');
+  rb.addEventListener('click',function(){
+    roofGroup.visible=!roofGroup.visible;
+    rb.setAttribute('aria-pressed', roofGroup.visible?'true':'false');
+  });
+  sb.addEventListener('click',function(){
+    spinning=!spinning; sb.setAttribute('aria-pressed', spinning?'true':'false');
+  });
+  document.getElementById('reset').addEventListener('click',function(){
+    az=-0.75; el=0.42; dist=150; place();
+  });
+
+  function size(){
+    var w=cv.clientWidth, h=cv.clientHeight;
+    renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+    renderer.setSize(w,h,false);
+    cam.aspect=w/h; cam.updateProjectionMatrix();
+  }
+  window.addEventListener('resize',size);
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  (function loop(){
+    requestAnimationFrame(loop);
+    if(spinning && !reduce){ az += 0.0035; place(); }
+    renderer.render(scene,cam);
+  })();
+  size(); place();
+})();
+</script>
+</body>
+</html>
