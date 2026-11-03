@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<title>Kenai Peninsula house tour</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@400;500;600&family=Azeret+Mono:wght@400;500&display=swap">
+<style>
+  :root{
+    --ground:#f4f2ed; --card:#fff; --ink:#191a17; --muted:#5f6660; --rule:#dcd9d1; --firm:#b4b0a6;
+    --cph:#b3341f; --school:#2f6fa8; --park:#3f7d45; --gym:#7a4ca8; --trail:#a86a1f;
+    --am:#1d6a63; --pm:#9a5b1f; --wed:#3b4f8a;
+    --ui:"Barlow Semi Condensed",system-ui,sans-serif; --mono:"Azeret Mono",ui-monospace,monospace;
+  }
+  @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+    --ground:#14161a; --card:#1c1f24; --ink:#e7e9e4; --muted:#9aa09a; --rule:#2e333a; --firm:#49505a;
+    --cph:#f0714f; --school:#6fa8dc; --park:#74c38c; --gym:#b98fe0; --trail:#ddaa55;
+    --am:#5fc5ba; --pm:#e0a35c; --wed:#8fa6e0;}}
+  :root[data-theme="dark"]{
+    --ground:#14161a; --card:#1c1f24; --ink:#e7e9e4; --muted:#9aa09a; --rule:#2e333a; --firm:#49505a;
+    --cph:#f0714f; --school:#6fa8dc; --park:#74c38c; --gym:#b98fe0; --trail:#ddaa55;
+    --am:#5fc5ba; --pm:#e0a35c; --wed:#8fa6e0;}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--ui);font-size:17px;line-height:1.4;
+       padding:1rem 1rem 3rem;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:54rem;margin:0 auto}
+  h1{margin:0;font-size:1.6rem;font-weight:600;letter-spacing:-.01em}
+  .sub{font-family:var(--mono);font-size:.7rem;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-top:.25rem}
+  .bar{display:flex;gap:.4rem;flex-wrap:wrap;margin:.9rem 0;border-top:1px solid var(--firm);border-bottom:1px solid var(--firm);padding:.7rem 0}
+  .tab{font-family:var(--mono);font-size:.7rem;letter-spacing:.06em;text-transform:uppercase;padding:.45em .7em;
+       border:1px solid var(--firm);background:transparent;color:var(--muted);cursor:pointer;border-radius:3px}
+  .tab[aria-pressed="true"]{background:var(--ink);color:var(--ground);border-color:var(--ink)}
+  figure{margin:0 0 1rem}
+  svg{display:block;width:100%;height:auto;background:var(--card);border:1px solid var(--rule);border-radius:4px}
+  .legend{display:flex;flex-wrap:wrap;gap:.3rem .9rem;font-family:var(--mono);font-size:.65rem;color:var(--muted);margin-top:.4rem}
+  .legend i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:.3rem;vertical-align:-1px}
+  .card{background:var(--card);border:1px solid var(--rule);border-radius:4px;margin-bottom:.7rem;overflow:hidden}
+  .card.expired{opacity:.72}
+  .top{display:flex;gap:.6rem;padding:.7rem .8rem;align-items:flex-start}
+  .pin{font-family:var(--mono);font-size:.8rem;font-weight:500;color:#fff;background:var(--am);
+       min-width:1.9rem;height:1.9rem;display:flex;align-items:center;justify-content:center;border-radius:3px;flex:0 0 auto}
+  .pin.pm{background:var(--pm)} .pin.wed{background:var(--wed)}
+  .addr{font-weight:600;font-size:1.05rem;line-height:1.2}
+  .when{font-family:var(--mono);font-size:.7rem;color:var(--muted);margin-top:.15rem}
+  .price{margin-left:auto;text-align:right;font-family:var(--mono);font-weight:500;white-space:nowrap}
+  .psf{display:block;font-size:.65rem;color:var(--muted);font-weight:400}
+  .facts{display:flex;flex-wrap:wrap;gap:.2rem .9rem;padding:0 .8rem .6rem;font-family:var(--mono);font-size:.72rem;color:var(--muted)}
+  .facts b{color:var(--ink);font-weight:500}
+  .near{padding:.55rem .8rem;border-top:1px solid var(--rule);display:grid;
+        grid-template-columns:repeat(auto-fit,minmax(10rem,1fr));gap:.3rem .8rem;font-size:.85rem}
+  .near span{color:var(--muted)}
+  .near b{font-weight:500;color:var(--ink)}
+  .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:.35rem;vertical-align:0}
+  .note{padding:.55rem .8rem;border-top:1px solid var(--rule);font-size:.9rem;background:var(--ground)}
+  .note strong{font-weight:600}
+  .agent{padding:.5rem .8rem;border-top:1px solid var(--rule);font-family:var(--mono);font-size:.67rem;color:var(--muted);
+         display:flex;flex-wrap:wrap;gap:.2rem .8rem}
+  .agent a{color:inherit}
+  .flag{display:inline-block;font-family:var(--mono);font-size:.6rem;letter-spacing:.08em;text-transform:uppercase;
+        padding:.15em .4em;border:1px solid currentColor;border-radius:2px;margin-left:.4rem;vertical-align:1px}
+  .flag.moved{color:var(--pm)} .flag.exp{color:var(--cph)} .flag.approx{color:var(--muted)}
+  h2{font-family:var(--mono);font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);
+     font-weight:500;margin:1.4rem 0 .5rem}
+  footer{margin-top:1.6rem;border-top:1px solid var(--firm);padding-top:.8rem;
+         font-family:var(--mono);font-size:.65rem;line-height:1.7;color:var(--muted)}
+  a.tel{color:var(--ink);text-decoration:none;border-bottom:1px solid var(--firm)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Kenai Peninsula house tour</h1>
+  <div class="sub" id="sub"></div>
+
+  <div class="bar" id="tabs"></div>
+
+  <figure>
+    <svg id="map" viewBox="0 0 1000 760" role="img" aria-label="Map of tour stops and local amenities"></svg>
+    <div class="legend">
+      <span><i style="background:var(--cph)"></i>Hospital</span>
+      <span><i style="background:var(--school)"></i>School</span>
+      <span><i style="background:var(--park)"></i>Park / playground</span>
+      <span><i style="background:var(--gym)"></i>Gym</span>
+      <span><i style="background:var(--trail)"></i>Trails</span>
+      <span><i style="background:var(--am)"></i>Tue AM</span>
+      <span><i style="background:var(--pm)"></i>Tue PM</span>
+      <span><i style="background:var(--wed)"></i>Wed</span>
+    </div>
+  </figure>
+
+  <div id="list"></div>
+  <footer id="foot"></footer>
+</div>
+
+<script>window.TOUR = /*DATA*/{"generated":"2026-11-03T10:06:55.5040047-08:00","hospital":{"lon":-151.0771,"lat":60.49323,"name":"Central Peninsula Hospital","note":"Catherine\u0027s hospital","kind":"hospital"},"stops":[{"day":"Tue AM","n":1,"addr":"40248 Arrowhead Avenue, Soldotna, AK 99669","price":815000,"bed":4,"bath":4,"sqft":4628,"lat":60.516690960173,"lon":-150.946443966217,"cphMi":6.4,"cphMin":14,"nearschool":"Soldotna Elementary (K-6) (4.6 mi)","nearpark":"Rotary Park (3.4 mi)","neargym":"The Fitness Place (4.4 mi)","neartrail":"Tsalteshi Trails (6.5 mi)","time":"9:00 - 9:45 AM","mls":"#26-12828","agent":"Kelly Griebel, Century 21","phone":"(907) 398-7293","publicNote":"Two separate listings: $815,000 without the extra lot, $934,000 with it."},{"day":"Tue AM","n":2,"addr":"42469 Maney Circle, Soldotna, AK 99669","price":580000,"bed":6,"bath":4,"sqft":3200,"lat":60.507612673959,"lon":-151.013396350151,"cphMi":3.5,"cphMin":10,"nearschool":"Soldotna Elementary (K-6) (2.3 mi)","nearpark":"Swiftwater Park (1.8 mi)","neargym":"The Fitness Place (2.1 mi)","neartrail":"Tsalteshi Trails (4.4 mi)","time":"9:30 - 10:45 AM","mls":"#26-13069","agent":"Melissa Daugherty, Century 21","phone":"(907) 252-5909","publicNote":"Duplex - only the right side (unit B) can be shown. It is vacant."},{"day":"Tue AM","n":3,"addr":"36880 Kendanemken Road, Soldotna, AK 99669","price":720000,"bed":5,"bath":4,"sqft":3188,"lat":60.514483063426,"lon":-151.021086285261,"cphMi":4.1,"cphMin":12,"nearschool":"Soldotna Elementary (K-6) (2.3 mi)","nearpark":"Swiftwater Park (2.1 mi)","neargym":"The Fitness Place (2.2 mi)","neartrail":"Tsalteshi Trails (4.6 mi)","time":"10:00 - 11:00 AM","mls":"#26-7187","agent":"Tiffany Holly, Century 21","phone":"(907) 398-1545","publicNote":""},{"day":"Tue AM","n":4,"addr":"575 Pace Street, Soldotna, AK 99669","price":699750,"bed":4,"bath":2,"sqft":2280,"lat":60.493853933651,"lon":-151.03856232618,"cphMi":2.1,"cphMin":6,"nearschool":"Soldotna Elementary (K-6) (1.1 mi)","nearpark":"Swiftwater Park (0.6 mi)","neargym":"The Fitness Place (0.9 mi)","neartrail":"Tsalteshi Trails (3.1 mi)","time":"10:30 AM - 12:00 PM","mls":"#26-6697","agent":"Katie Uei, EXP Realty","phone":"(907) 398-3864","publicNote":""},{"day":"Tue AM","n":5,"addr":"36420 Northern Lights Boulevard, Soldotna, AK 99669","price":785000,"bed":8,"bath":7,"sqft":5616,"lat":60.507417260576,"lon":-151.072311696767,"cphMi":1.4,"cphMin":6,"nearschool":"Soldotna Elementary (K-6) (1.1 mi)","nearpark":"Soldotna Creek Park (1.7 mi)","neargym":"The Fitness Place (1.1 mi)","neartrail":"Tsalteshi Trails (3.3 mi)","time":"11:00 AM - 12:15 PM","mls":"#26-3456","agent":"Ross Baxter, Jack White","phone":"(907) 398-7264","publicNote":"WINTERIZED - water is off, so expect no running water to test."},{"day":"Tue AM","n":6,"addr":"530 W Riverview Avenue, Soldotna, AK 99669","price":670000,"bed":5,"bath":5,"sqft":3888,"lat":60.484201587858,"lon":-151.102060711597,"cphMi":1.6,"cphMin":7,"nearschool":"Redoubt Elementary (0.3 mi)","nearpark":"Centennial Park (0.4 mi)","neargym":"Soldotna Regional Sports Complex (0.6 mi)","neartrail":"Tsalteshi Trails (1.5 mi)","time":"11:30 AM","mls":"#26-12134","agent":"Andrea Kircher, Century 21","phone":"","publicNote":"Vacant."},{"day":"Tue PM","n":1,"addr":"47489 Wispen Avenue, Kenai, AK 99611","price":719900,"bed":3,"bath":3,"sqft":3334,"lat":null,"lon":null,"approx":true,"time":"2:00 - 3:00 PM","mls":"#26-9016","agent":"Mark Kottke, Jack White Kenai","phone":"(907) 912-0212","publicNote":"Vacant - remove shoes."},{"day":"Tue PM","n":2,"addr":"2675 Watergate Way, Kenai, AK 99611","price":740000,"bed":4,"bath":3,"sqft":3244,"lat":60.519625158838,"lon":-151.244645470019,"cphMi":10.1,"cphMin":18,"nearschool":"Kenai Central High (3.1 mi)","nearpark":"Kenai Municipal Park (2.7 mi)","neargym":"Anytime Fitness (2.7 mi)","neartrail":"Tsalteshi Trails (6.2 mi)","time":"2:30 - 3:45 PM","mls":"#26-8749","agent":"Tennessee Walker, Jack White","phone":"(907) 394-5828","publicNote":"Follow up with Tennessee."},{"day":"Tue PM","n":3,"addr":"1501 Pey Drive, Kenai, AK 99611","price":890000,"bed":5,"bath":4,"sqft":3606,"lat":60.580746987632,"lon":-151.326578557365,"cphMi":13.9,"cphMin":27,"nearschool":"Kenai Central High (4.1 mi)","nearpark":"Kenai Municipal Park (2.4 mi)","neargym":"Anytime Fitness (7.4 mi)","neartrail":"Tsalteshi Trails (11.1 mi)","time":"MOVED to Wed 2:00 PM","mls":"#26-6823","agent":"Richard Davids, Sun Properties","phone":"(907) 242-6446","publicNote":"MOVED off Tuesday - now Wednesday at 2:00 PM."},{"day":"Tue PM","n":4,"addr":"1245 Wells Way, Kenai, AK 99611","price":1300000,"bed":4,"bath":4,"sqft":4382,"lat":60.577822055792,"lon":-151.321287214116,"cphMi":13.8,"cphMin":26,"nearschool":"Kenai Central High (3.8 mi)","nearpark":"Kenai Municipal Park (2.2 mi)","neargym":"Anytime Fitness (7.1 mi)","neartrail":"Tsalteshi Trails (10.9 mi)","time":"3:30 - 4:30 PM","mls":"#26-11412","agent":"Fred Braun, Jack White Kenai","phone":"(907) 252-8375","publicNote":"Message Martha - needs more time than the slot allows."},{"day":"Tue PM","n":5,"addr":"305 Hutto Street, Kenai, AK 99611","price":899500,"bed":3,"bath":3,"sqft":2253,"lat":60.56435689389,"lon":-151.215342711344,"cphMi":9.3,"cphMin":19,"nearschool":"Kenai Central High (0.2 mi)","nearpark":"Kenai Municipal Park (2.1 mi)","neargym":"Anytime Fitness (4.2 mi)","neartrail":"Tsalteshi Trails (8 mi)","time":"4:00 - 5:30 PM","mls":"#26-9442","agent":"Kelly Griebel, Century 21","phone":"(907) 398-7293","publicNote":"Call to move the time and confirm the showing."},{"day":"Tue PM","n":6,"addr":"5220 Swallow Drive, Kenai, AK 99611","price":595000,"bed":3,"bath":4,"sqft":3730,"lat":60.535550327,"lon":-151.081123271053,"cphMi":3.3,"cphMin":8,"nearschool":"Soldotna High (3 mi)","nearpark":"Soldotna Creek Park (3.7 mi)","neargym":"The Fitness Place (3.1 mi)","neartrail":"Tsalteshi Trails (5.1 mi)","time":"4:30 - 6:00 PM","mls":"#26-6245","agent":"Melissa Daugherty, Century 21","phone":"(907) 252-5909","publicNote":"Call Melissa when you are heading there AND when you leave."},{"day":"Wed","n":1,"addr":"49820 Leisure Lake Drive, Soldotna, AK 99669","price":990000,"bed":7,"bath":8,"sqft":5633,"lat":60.413884583571,"lon":-151.208753587656,"cphMi":9.3,"cphMin":21,"nearschool":"Skyview Middle (4.8 mi)","nearpark":"Centennial Park (6 mi)","neargym":"Soldotna Regional Sports Complex (5.6 mi)","neartrail":"Tsalteshi Trails (4.9 mi)","time":"9:00 - 10:00 AM","mls":"#26-6244","agent":"Stacie Krause, Jack White","phone":"(907) 252-3086","publicNote":"Open the shades for the showing and close them after. Outside lights must be left on."},{"day":"Wed","n":2,"addr":"49534 Sterling Highway, Soldotna, AK 99669","price":595000,"bed":5,"bath":3,"sqft":4404,"lat":60.50074,"lon":-150.99706,"approx":true,"cphMi":3.5,"cphMin":8,"nearschool":"Soldotna Elementary (K-6) (2.6 mi)","nearpark":"Rotary Park (1.5 mi)","neargym":"The Fitness Place (2.4 mi)","neartrail":"Tsalteshi Trails (4.5 mi)","time":"9:30 - 11:00 AM","mls":"#26-11035","agent":"Raquel Hawkins, Mossy Oak","phone":"(907) 394-0980","publicNote":"Access details are on the printed sheet. Map pin is approximate - highway address."},{"day":"Wed","n":3,"addr":"34225 Page Street, Soldotna, AK 99669","price":865000,"bed":5,"bath":5,"sqft":2489,"lat":60.475728536865,"lon":-151.167611060838,"cphMi":5.6,"cphMin":14,"nearschool":"K-Beach Elementary (1.1 mi)","nearpark":"Centennial Park (2.5 mi)","neargym":"Anytime Fitness (2.2 mi)","neartrail":"Tsalteshi Trails (2.3 mi)","time":"10:00 - 11:15 AM","mls":"#26-11841","agent":"Annette Pankoski, Alaska 1st","phone":"(907) 398-8792","publicNote":"Three structures to see: house, shop and apartment."},{"day":"Wed","n":4,"addr":"36243 Schultz Street, Soldotna, AK 99669","price":809000,"bed":5,"bath":5,"sqft":2936,"lat":60.505846011934,"lon":-150.95537924862,"cphMi":5.1,"cphMin":10,"nearschool":"Soldotna Elementary (K-6) (4.1 mi)","nearpark":"Rotary Park (2.7 mi)","neargym":"The Fitness Place (3.9 mi)","neartrail":"Tsalteshi Trails (5.9 mi)","time":"10:30 - 11:45 AM","mls":"#26-11590","agent":"Traci Hansen, Jack White","phone":"(907) 953-3351","publicNote":"Vacant - call Traci for access."},{"day":"Wed","n":5,"addr":"34313 Jabila Drive, Soldotna, AK 99669","price":1050000,"bed":4,"bath":4,"sqft":4790,"lat":60.47786910669,"lon":-150.955405655929,"cphMi":7.8,"cphMin":19,"nearschool":"Soldotna Elementary (K-6) (4 mi)","nearpark":"Rotary Park (2.1 mi)","neargym":"The Fitness Place (3.9 mi)","neartrail":"Tsalteshi Trails (5.2 mi)","time":"11:00 AM - 12:15 PM","mls":"#26-13016","agent":"Jennifer Howell, Jack White","phone":"(907) 394-4659","publicNote":""},{"day":"Wed","n":6,"addr":"39930 Sapphire Loop, Soldotna, AK 99669","price":849000,"bed":5,"bath":5,"sqft":5331,"lat":60.486106312211,"lon":-150.938087537093,"cphMi":7.2,"cphMin":17,"nearschool":"Soldotna Elementary (K-6) (4.5 mi)","nearpark":"Rotary Park (2.7 mi)","neargym":"The Fitness Place (4.3 mi)","neartrail":"Tsalteshi Trails (5.9 mi)","time":"11:30 AM - 12:30 PM","mls":"#25-13471","agent":"Kelly Griebel, Century 21","phone":"(907) 398-7293","publicNote":"Listing shows EXPIRED - confirm it is still available before touring. Key is stored on site; ask Denise."}],"amenities":[{"lon":-151.0771,"lat":60.49323,"name":"Central Peninsula Hospital","note":"Catherine\u0027s hospital","kind":"hospital"},{"lon":-151.07064,"lat":60.49109,"name":"Soldotna Elementary (K-6)","note":"Verified attendance school for the Arrowhead area","kind":"school"},{"lon":-151.09596,"lat":60.48876,"name":"Soldotna Prep (7-8)","note":"","kind":"school"},{"lon":-151.09595,"lat":60.4932,"name":"Soldotna High","note":"","kind":"school"},{"lon":-151.09976,"lat":60.48832,"name":"Redoubt Elementary","note":"","kind":"school"},{"lon":-151.14169,"lat":60.48623,"name":"K-Beach Elementary","note":"","kind":"school"},{"lon":-151.10064,"lat":60.45813,"name":"Skyview Middle","note":"","kind":"school"},{"lon":-151.21322,"lat":60.56131,"name":"Kenai Central High","note":"","kind":"school"},{"lon":-151.20628,"lat":60.56229,"name":"Kenai Middle","note":"","kind":"school"},{"lon":-151.10411,"lat":60.46274,"name":"Tsalteshi Trails","note":"Main ski/run/bike trail system, at Skyview","kind":"trail"},{"lon":-151.06538,"lat":60.49144,"name":"The Fitness Place","note":"24/7. Family $80/mo for 3, +$30 each","kind":"gym"},{"lon":-151.16852,"lat":60.50774,"name":"Anytime Fitness","note":"24/7, under-18 approved","kind":"gym"},{"lon":-151.10238,"lat":60.47616,"name":"Soldotna Regional Sports Complex","note":"Ice rink, track, community events","kind":"gym"},{"lon":-151.06426,"lat":60.48262,"name":"Soldotna Creek Park","note":"Playground, riverfront, summer market","kind":"park"},{"lon":-151.09537,"lat":60.48015,"name":"Centennial Park","note":"Campground, river access","kind":"park"},{"lon":-151.04169,"lat":60.48548,"name":"Swiftwater Park","note":"Playground, campground, boat launch","kind":"park"},{"lon":-151.01601,"lat":60.48107,"name":"Rotary Park","note":"","kind":"park"},{"lon":-151.27528,"lat":60.55619,"name":"Kenai Municipal Park","note":"Playground","kind":"park"}]}/*END*/;</script>
+<script>
+(function(){
+  "use strict";
+  var D = window.TOUR || {stops:[],amenities:[]};
+  var STOPS = D.stops || [], AM = D.amenities || [];
+  var DAYS = ["Tue AM","Tue PM","Wed"];
+  var cls = {"Tue AM":"","Tue PM":"pm","Wed":"wed"};
+  var view = "all";
+
+  function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){
+    return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
+  function money(n){return "$"+Number(n).toLocaleString();}
+
+  // ---- header ----
+  var located = STOPS.filter(function(s){return s.lat;}).length;
+  document.getElementById("sub").textContent =
+    STOPS.length + " showings · Tue Nov 3 – Wed Nov 4, 2026 · Denise Ashman, Jack White Real Estate";
+
+  // ---- tabs ----
+  var tabs = document.getElementById("tabs");
+  [["all","All "+STOPS.length]].concat(DAYS.map(function(d){
+    return [d, d+" "+STOPS.filter(function(s){return s.day===d;}).length];
+  })).forEach(function(t){
+    var b=document.createElement("button");
+    b.type="button"; b.className="tab"; b.textContent=t[1];
+    b.setAttribute("aria-pressed", view===t[0]?"true":"false");
+    b.addEventListener("click",function(){
+      view=t[0];
+      [].forEach.call(tabs.children,function(c){c.setAttribute("aria-pressed","false");});
+      b.setAttribute("aria-pressed","true");
+      draw(); list();
+    });
+    tabs.appendChild(b);
+  });
+
+  function shown(){ return STOPS.filter(function(s){return view==="all"||s.day===view;}); }
+
+  // ---- map ----
+  function draw(){
+    var pts = STOPS.filter(function(s){return s.lat;}).concat(AM);
+    var lats = pts.map(function(p){return p.lat;}), lons = pts.map(function(p){return p.lon;});
+    var minLa=Math.min.apply(null,lats), maxLa=Math.max.apply(null,lats);
+    var minLo=Math.min.apply(null,lons), maxLo=Math.max.apply(null,lons);
+    var padLa=(maxLa-minLa)*0.08, padLo=(maxLo-minLo)*0.08;
+    minLa-=padLa; maxLa+=padLa; minLo-=padLo; maxLo+=padLo;
+    var W=1000,H=760,M=34;
+    var k=Math.cos(((minLa+maxLa)/2)*Math.PI/180);   // longitude shrinks with latitude
+    var sx=(W-2*M)/((maxLo-minLo)*k), sy=(H-2*M)/(maxLa-minLa), s=Math.min(sx,sy);
+    var ox=M+((W-2*M)-((maxLo-minLo)*k*s))/2, oy=M+((H-2*M)-((maxLa-minLa)*s))/2;
+    function X(lo){return ox+(lo-minLo)*k*s;}
+    function Y(la){return oy+(maxLa-la)*s;}
+
+    var o="";
+    // scale bar: 2 miles
+    var milePx = (1/69.0)*s;             // 1 deg latitude ~ 69 miles
+    var barPx = milePx*2;
+    o+='<g font-family="Azeret Mono, monospace">';
+    o+='<line x1="'+M+'" y1="'+(H-18)+'" x2="'+(M+barPx)+'" y2="'+(H-18)+'" stroke="currentColor" stroke-width="2" opacity=".55"/>';
+    o+='<text x="'+(M+barPx+8)+'" y="'+(H-14)+'" font-size="15" fill="currentColor" opacity=".55">2 mi</text></g>';
+
+    var colors={hospital:"var(--cph)",school:"var(--school)",park:"var(--park)",gym:"var(--gym)",trail:"var(--trail)"};
+    AM.forEach(function(a){
+      var x=X(a.lon),y=Y(a.lat),c=colors[a.kind]||"var(--muted)";
+      if(a.kind==="hospital"){
+        o+='<g><path d="M'+(x-9)+' '+y+' h18 M'+x+' '+(y-9)+' v18" stroke="'+c+'" stroke-width="5" fill="none" stroke-linecap="round"/>'
+         +'<text x="'+(x+13)+'" y="'+(y+5)+'" font-size="16" font-weight="600" fill="'+c+'" font-family="Barlow Semi Condensed, sans-serif">CPH</text></g>';
+      } else {
+        o+='<circle cx="'+x+'" cy="'+y+'" r="5" fill="'+c+'" opacity=".9"/>';
+        o+='<text x="'+(x+8)+'" y="'+(y+4)+'" font-size="13" fill="'+c+'" font-family="Barlow Semi Condensed, sans-serif" opacity=".95">'+esc(a.name)+'</text>';
+      }
+    });
+
+    var dayColor={"Tue AM":"var(--am)","Tue PM":"var(--pm)","Wed":"var(--wed)"};
+    STOPS.forEach(function(st){
+      if(!st.lat) return;
+      var on = (view==="all"||st.day===view);
+      var x=X(st.lon),y=Y(st.lat),c=dayColor[st.day];
+      o+='<g opacity="'+(on?1:0.18)+'">';
+      o+='<circle cx="'+x+'" cy="'+y+'" r="15" fill="'+c+'"/>';
+      o+='<text x="'+x+'" y="'+(y+6)+'" text-anchor="middle" font-size="16" font-weight="600" fill="#fff" font-family="Azeret Mono, monospace">'+st.n+'</text>';
+      o+='</g>';
+    });
+    document.getElementById("map").innerHTML=o;
+  }
+
+  // ---- cards ----
+  function list(){
+    var host=document.getElementById("list"); host.innerHTML="";
+    var cur=null;
+    shown().forEach(function(s){
+      if(s.day!==cur){ cur=s.day; var h=document.createElement("h2"); h.textContent=cur; host.appendChild(h); }
+      var c=document.createElement("div");
+      c.className="card"+(/EXPIRED/i.test(s.note||"")?" expired":"");
+      var flags="";
+      if(/MOVED/i.test(s.note||"")) flags+='<span class="flag moved">moved</span>';
+      if(/EXPIRED/i.test(s.note||"")) flags+='<span class="flag exp">expired</span>';
+      if(s.approx) flags+='<span class="flag approx">approx. location</span>';
+      var psf = s.sqft ? Math.round(s.price/s.sqft) : null;
+
+      var html='<div class="top"><div class="pin '+cls[s.day]+'">'+s.n+'</div><div>'
+        +'<div class="addr">'+esc((s.addr||"").replace(/,\s*AK.*$/,""))+flags+'</div>'
+        +'<div class="when">'+esc(s.time||"")+'</div></div>'
+        +'<div class="price">'+money(s.price)+(psf?'<span class="psf">$'+psf+'/sqft</span>':'')+'</div></div>';
+
+      html+='<div class="facts"><span><b>'+s.bed+'</b> bd</span><span><b>'+s.bath+'</b> ba</span>'
+        +'<span><b>'+Number(s.sqft).toLocaleString()+'</b> sqft</span>';
+      if(s.cphMi!=null) html+='<span>CPH <b>'+s.cphMi+' mi / '+s.cphMin+' min</b></span>';
+      html+='</div>';
+
+      if(s.nearschool||s.nearpark||s.neargym||s.neartrail){
+        html+='<div class="near">';
+        if(s.nearschool) html+='<div><span class="dot" style="background:var(--school)"></span><b>School</b> <span>'+esc(s.nearschool)+'</span></div>';
+        if(s.nearpark)   html+='<div><span class="dot" style="background:var(--park)"></span><b>Park</b> <span>'+esc(s.nearpark)+'</span></div>';
+        if(s.neargym)    html+='<div><span class="dot" style="background:var(--gym)"></span><b>Gym</b> <span>'+esc(s.neargym)+'</span></div>';
+        if(s.neartrail)  html+='<div><span class="dot" style="background:var(--trail)"></span><b>Trails</b> <span>'+esc(s.neartrail)+'</span></div>';
+        html+='</div>';
+      }
+      if(s.publicNote) html+='<div class="note">'+esc(s.publicNote)+'</div>';
+      html+='<div class="agent"><span>'+esc(s.mls||"")+'</span><span>'+esc(s.agent||"")+'</span>'
+        +(s.phone?'<span><a class="tel" href="tel:'+esc(s.phone.replace(/[^0-9]/g,""))+'">'+esc(s.phone)+'</a></span>':'')+'</div>';
+      c.innerHTML=html; host.appendChild(c);
+    });
+  }
+
+  document.getElementById("foot").innerHTML =
+    "Distances to Central Peninsula Hospital are real driving routes (OSRM). Nearest school / park / gym / trail are straight-line. "
+    + "House coordinates from the US Census geocoder; amenities from OpenStreetMap. "
+    + located + " of " + STOPS.length + " stops are mapped. "
+    + "<br>Lockbox and keypad codes are deliberately NOT on this page — it is a public site. They stay in the printed tour sheet.";
+
+  draw(); list();
+})();
+</script>
+</body>
+</html>
